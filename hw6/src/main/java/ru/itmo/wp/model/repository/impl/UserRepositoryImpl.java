@@ -1,0 +1,141 @@
+package ru.itmo.wp.model.repository.impl;
+
+import ru.itmo.wp.model.database.DatabaseUtils;
+import ru.itmo.wp.model.domain.Element;
+import ru.itmo.wp.model.domain.User;
+import ru.itmo.wp.model.exception.RepositoryException;
+import ru.itmo.wp.model.repository.UserRepository;
+
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.*;
+
+@SuppressWarnings("SqlNoDataSourceInspection")
+public class UserRepositoryImpl extends ElementRepository implements UserRepository {
+    private final DataSource DATA_SOURCE = DatabaseUtils.getDataSource();
+
+    @Override
+    public User find(long id) {
+        return castElement(baseFindOne(new HashSet<Pair>(Arrays.asList(new Pair("long", id))),
+                "SELECT * FROM User WHERE id=?"));
+    }
+
+    @Override
+    public User findByLogin(String login)  {
+        return castElement(baseFindOne(new HashSet<Pair>(Arrays.asList(new Pair("string", login))),
+                "SELECT * FROM User WHERE login=?"));
+    }
+
+    @Override
+    public User findByEmail(String email)  {
+        return castElement(baseFindOne(new HashSet<Pair>(Arrays.asList(new Pair("string", email))),
+                "SELECT * FROM User WHERE email=?"));
+    }
+
+    @Override
+    public User findByLoginAndPasswordSha(String login, String passwordSha)  {
+        return castElement(baseFindOne(new LinkedHashSet<Pair>(Arrays.asList(new Pair("string", login),
+                        new Pair("string", passwordSha))), "SELECT * FROM User WHERE login=? AND passwordSha=?"));
+    }
+
+    @Override
+    public User findByEmailAndPasswordSha(String email, String passwordSha)  {
+        return castElement(baseFindOne(new LinkedHashSet<Pair>(Arrays.asList(new Pair("string", email),
+                        new Pair("string", passwordSha))), "SELECT * FROM User WHERE email=? AND passwordSha=?"));
+    }
+
+    @Override
+    public User findByLoginOrEmailAndPasswordSha(String loginOrEmail, String passwordSha)  {
+        if (loginOrEmail.contains("@")) {
+            return castElement(findByEmailAndPasswordSha(loginOrEmail, passwordSha));
+        } else {
+            return castElement(findByLoginAndPasswordSha(loginOrEmail, passwordSha));
+        }
+    }
+
+
+    @Override
+    public int findCount() {
+        try (Connection connection = DATA_SOURCE.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM User")) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    resultSet.next();
+                    return resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RepositoryException("Can't find User.", e);
+        }
+    }
+
+
+    @Override
+    public List<User> findAll()  {
+        return castElement(baseFindMany(new LinkedHashSet<Pair>(), "SELECT * FROM User ORDER BY id DESC"));
+    }
+
+    protected User toElement(ResultSetMetaData metaData, ResultSet resultSet) throws SQLException {
+        if (!resultSet.next()) {
+            return null;
+        }
+        User user = new User();
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+            switch (metaData.getColumnName(i)) {
+                case "id":
+                    user.setId(resultSet.getLong(i));
+                    break;
+                case "login":
+                    user.setLogin(resultSet.getString(i));
+                    break;
+                case "email":
+                    user.setEmail(resultSet.getString(i));
+                    break;
+                case "creationTime":
+                    user.setCreationTime(resultSet.getTimestamp(i));
+                    break;
+                default:
+                    // No operations.
+            }
+        }
+        return user;
+    }
+
+    @Override
+    public void save(User user, String passwordSha) {
+        try (Connection connection = DATA_SOURCE.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO `User` (`login`, `passwordSha`, `email`, `creationTime`) VALUES (?, ?, ?, NOW())",
+                    Statement.RETURN_GENERATED_KEYS
+            )) {
+                statement.setString(1, user.getLogin());
+                statement.setString(2, passwordSha);
+                statement.setString(3, user.getEmail());
+                if (statement.executeUpdate() != 1) {
+                    throw new RepositoryException("Can't save User.");
+                } else {
+                    ResultSet generatedKeys = statement.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        user.setId(generatedKeys.getLong(1));
+                        user.setCreationTime(((User)find(user.getId())).getCreationTime());
+                    } else {
+                        throw new RepositoryException("Can't save User [no autogenerated fields].");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RepositoryException("Can't save User.", e);
+        }
+    }
+
+    private User castElement(Element el) {
+        return (User)el;
+    }
+
+    private List<User> castElement(List<Element> listEl) {
+        List<User> users = new ArrayList<>();
+        for (Element e : listEl) {
+            users.add((User)e);
+        }
+        return users;
+    }
+}
