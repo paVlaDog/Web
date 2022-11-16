@@ -3,15 +3,15 @@ package ru.itmo.wp.web.page;
 import com.google.common.base.Strings;
 import ru.itmo.wp.model.domain.User;
 import ru.itmo.wp.model.service.UserService;
+import ru.itmo.wp.web.exception.RedirectException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-public class Page {
+public abstract class Page {
     HttpServletRequest request;
 
-    protected void action(HttpServletRequest request, Map<String, Object> view) {
-    }
+    protected void action(HttpServletRequest request, Map<String, Object> view) {}
 
     protected void before(HttpServletRequest request, Map<String, Object> view) {
         this.request = request;
@@ -50,6 +50,13 @@ public class Page {
 
     protected User getUser() {
         return (User)request.getSession().getAttribute("user");
+    }
+
+    protected void checkLoggedUser(HttpServletRequest request) {
+        if (request.getSession().getAttribute("user") == null) {
+            setMessage("You aren't authorized");
+            throw new RedirectException("/index");
+        }
     }
 }
 

@@ -11,6 +11,7 @@ import ru.itmo.wp.model.service.UserService;
 import ru.itmo.wp.web.exception.RedirectException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
 import java.util.Map;
 
 @SuppressWarnings({"unused"})
@@ -28,19 +29,19 @@ public class TalksPage extends Page {
         checkLoggedUser(request);
 
         Talk talk = new Talk();
-        talk.setSourceUserId(getUser().getId());
-        talk.setTargetUserId(Long.parseLong(request.getParameter("targetUserId")));
-        talk.setText(request.getParameter("text"));
-        talkRepository.save(talk);
-        setMessage("You send message!");
-        view.put("talks", talkRepository.findBySourceOrTargetUserId(getUser().getId(), getUser().getId()));
-        throw new RedirectException("/talks");
-    }
-
-    private void checkLoggedUser(HttpServletRequest request) {
-        if (request.getSession().getAttribute("user") == null) {
-            setMessage("You aren't authorized");
-            throw new RedirectException("/index");
+        try {
+            long tarUsrId = Long.parseLong(request.getParameter("targetUserId"));
+            if (talkRepository.find(tarUsrId) != null && getUser() != null && !request.getParameter("text").trim().isEmpty()) {
+                talk.setSourceUserId(getUser().getId());
+                talk.setTargetUserId(tarUsrId);
+                talk.setText(request.getParameter("text"));
+                talkRepository.save(talk);
+                setMessage("You send message!");
+                view.put("talks", talkRepository.findBySourceOrTargetUserId(getUser().getId(), getUser().getId()));
+            }
+        } catch (NumberFormatException | NullPointerException e1) {
+            //
         }
+        throw new RedirectException("/talks");
     }
 }

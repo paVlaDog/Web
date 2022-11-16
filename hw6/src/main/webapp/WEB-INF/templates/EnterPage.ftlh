@@ -27,11 +27,7 @@
                         <input id="password" name="password" type="password" value="${password!}"/>
                     </div>
                 </div>
-                <#if error??>
-                    <div class="error">
-                        ${error!}
-                    </div>
-                </#if>
+                <div class="error"></div>
                 <div class="button-field">
                     <input type="submit" value="Enter">
                 </div>

@@ -38,6 +38,9 @@ public class UserService {
         if (user.getLogin().length() > 32) {
             throw new ValidationException("Login can't be longer than 32 letters");
         }
+        if (user.getEmail().length() > 32) {
+            throw new ValidationException("Email can't be longer than 32 letters");
+        }
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new ValidationException("Email is already in use");
         }
