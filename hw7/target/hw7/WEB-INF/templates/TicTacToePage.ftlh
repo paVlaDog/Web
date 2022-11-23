@@ -72,12 +72,12 @@
                         console.log("lol");
                         const data = {
                             action: "onMove",
-                            name: $(this).getAttribute("name"),
+                            name: $(this).find(".tictactoe-cell").getAttribute("name"),
                         };
-                        console.log(data.name);
+                        console.log(data[name]);
                         ajax(data, function(response) {
-                            if (response["redirect"]) {
-                                location.href = response["redirect"];
+                            if (response["cellsValue"]) {
+                                $(this).find(".tictactoe-cell").disable();
                             }
                         })
                         return false;
