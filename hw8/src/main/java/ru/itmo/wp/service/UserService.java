@@ -26,7 +26,12 @@ public class UserService {
 
     public User updateStatus(StatusCredentials statusCredentials) {
         User user = findById(Long.parseLong(statusCredentials.getUserId()));
-        userRepository.updateDisabled(user.getId(), statusCredentials.getStatus().equals("block"));
+        if (statusCredentials.getStatus().equals("block")) {
+            userRepository.updateDisabled(user.getId(), true);
+        } else if (statusCredentials.getStatus().equals("unBlock")) {
+            userRepository.updateDisabled(user.getId(), false);
+        }
+
         return user;
     }
 
