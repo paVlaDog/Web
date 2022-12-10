@@ -1,10 +1,12 @@
 package ru.itmo.wp.domain;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Sort;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
@@ -25,11 +27,13 @@ public class Post {
     @NotNull
     @NotEmpty
     @Size(min = 1, max = 60)
+//    @Pattern(regexp = "^/S+.*", message = "Stroke must be begin with not whitespace")
     private String title;
 
     @NotNull
     @NotEmpty
     @Size(min = 1, max = 65000)
+//    @Pattern(regexp = "^/S+.*", message = "Stroke must be begin with not whitespace")
     @Lob
     private String text;
 

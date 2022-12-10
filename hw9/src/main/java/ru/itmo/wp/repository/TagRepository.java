@@ -7,5 +7,5 @@ import ru.itmo.wp.domain.Tag;
 import java.util.List;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
-    Tag findByName(String name);
+    Tag findByNameOrderByName(String name);
 }

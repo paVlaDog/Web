@@ -67,12 +67,12 @@ public class UserService {
         post.setText(postForm.getText());
         Set<Tag> tags = new HashSet<>();
         for (String tagName : postForm.getTags().split(" ")) {
-            if (tagRepository.findByName(tagName) == null) {
+            if (tagRepository.findByNameOrderByName(tagName) == null) {
                 Tag tag = new Tag();
                 tag.setName(tagName);
                 tagRepository.save(tag);
             }
-            Tag tag = tagRepository.findByName(tagName);
+            Tag tag = tagRepository.findByNameOrderByName(tagName);
             tags.add(tag);
         }
         post.setTags(tags);

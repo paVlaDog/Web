@@ -34,7 +34,7 @@
             </div>
         </#if>
     <#else>
-        <h2>Post don't exist </h2>
+        <h2>Post doesn't exist </h2>
         <h6>like you</h6>
     </#if>
 

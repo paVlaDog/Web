@@ -41,7 +41,7 @@ public class WritePostPage extends Page {
 
 
 
-        userService.writePost(getUser(httpSession), postForm);
+            userService.writePost(getUser(httpSession), postForm);
         putMessage(httpSession, "You published new post");
 
         return "redirect:/myPosts";
