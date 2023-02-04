@@ -1,16 +1,17 @@
 <template>
-    <div class="middle">
-        <Sidebar :posts="viewPosts"/>
-        <main>
-            <Index :posts="posts" :users="users" :comments="comments" v-if="page === 'Index'"/>
-            <Post :userId="userId" :post="post" :users="users" :comments="comments" v-if="page === 'Post'"/>
-            <Enter v-if="page === 'Enter'"/>
-            <WritePost v-if="page === 'WritePost'"/>
-            <EditPost v-if="page === 'EditPost'"/>
-            <Register v-if="page === 'Register'"/>
-            <Users :users="users" v-if="page === 'Users'"/>
-        </main>
-    </div>
+  <div class="middle">
+    <Sidebar :posts="viewPosts"/>
+    <main>
+      <Index :posts="posts" :users="users" :comments="comments" v-if="page === 'Index'"/>
+      <Post :userId="userId" :post="post" :users="users" :comments="comments" v-if="page === 'Post'"/>
+      <Enter v-if="page === 'Enter'"/>
+      <WritePost v-if="page === 'WritePost'"/>
+      <EditPost v-if="page === 'EditPost'"/>
+      <Register v-if="page === 'Register'"/>
+      <TicTacToeBoard v-if="page === 'TicTacToe'"/>
+      <Users :users="users" v-if="page === 'Users'"/>
+    </main>
+  </div>
 </template>
 
 <script>
@@ -22,6 +23,7 @@ import EditPost from "./page/EditPost";
 import Register from "./page/Register";
 import Users from "./page/Users";
 import Post from "./page/Post";
+import TicTacToeBoard from "@/components/page/TicTacToe/TicTacToeBoard";
 
 export default {
     name: "Middle",
@@ -32,6 +34,7 @@ export default {
         }
     },
     components: {
+      TicTacToeBoard,
         WritePost,
         Enter,
         Index,

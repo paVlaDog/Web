@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Article v-for="post in posts" :post="post" :userLogin="userLogin(post.userId)"
+    <Article v-for="post in viewPosts" :post="post" :userLogin="userLogin(post.userId)"
              :commentsCount="commentsCount(post.id)" :key="post.id"/>
   </div>
 
@@ -23,6 +23,11 @@ export default {
         return Object.values(this.comments).filter(c => c.postId === postId).length;
       }
     },
+  computed: {
+    viewPosts: function () {
+      return Object.values(this.posts).sort((a, b) => b.id - a.id);
+    }
+  },
 }
 </script>
 

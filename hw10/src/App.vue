@@ -33,18 +33,18 @@ export default {
     beforeCreate() {
         this.$root.$on("onRegister", (login, nameUser) => {
           if (!this.userId) {
-            if (!login || login.length < 3 || login.length > 16) {
+            if (!login || login.trim().length < 3 || login.length > 16) {
               this.$root.$emit("onRegisterValidationError", "Login length from 3 to 16");
             } else if (Object.values(this.users).map(u => u.login).includes(login)) {
               this.$root.$emit("onRegisterValidationError", "Login is required");
-            } else if (!nameUser || nameUser.length > 32) {
+            } else if (!nameUser || nameUser.trim().length < 1 || nameUser.length > 32) {
               this.$root.$emit("onRegisterValidationError", "Name length from 1 to 32");
             } else {
               const id = Math.max(...Object.keys(this.users)) + 1;
               this.$root.$set(this.users, id, {
                 id, login, name: nameUser
               });
-              this.$root.$emit("onChangePage", "Index");
+              this.$root.$emit("onChangePage", "Enter");
             }
           } else {
             this.$root.$emit("onRegisterValidationError", "You already log in");
@@ -108,7 +108,7 @@ export default {
 
         this.$root.$on("onWriteComment", (text, postId) => {
           if (this.userId) {
-            if (!text) {
+            if (!text || text.trim().length < 1) {
               this.$root.$emit("onWriteCommentValidationError", "Text is empty!");
             } else {
               const id = Math.max(...Object.keys(this.comments)) + 1;

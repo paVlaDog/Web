@@ -69,12 +69,10 @@
             <script>
                 $(function () {
                     $(".tictactoe-board").find(".tictactoe-form").submit(function () {
-                        console.log("lol");
                         const data = {
                             action: "onMove",
                             name: $(this).find(".tictactoe-cell").getAttribute("name"),
                         };
-                        console.log(data[name]);
                         ajax(data, function(response) {
                             if (response["cellsValue"]) {
                                 $(this).find(".tictactoe-cell").disable();
